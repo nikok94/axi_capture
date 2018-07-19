@@ -1,0 +1,9 @@
+-batch 
+-create axi_capture 
+-ver 1.00.a 
+-dir "C:\LEMZ-T\COAL_RBS\axi_capture\edk_library\MyProcessorIPLib" 
+-lang vhdl 
+-bus axi4 s 
+-burst s 32 
+-arn 1 
+-xps 
