@@ -10,3 +10,4 @@ lib axi_time_scan_v1_00_a axi_capture vhdl
 lib axi_time_scan_v1_00_a axi_time_scan vhdl
 lib axi_time_scan_v1_00_a async_fifo_128 vhdl
 lib axi_time_scan_v1_00_a psync vhdl
+lib axi_time_scan_v1_00_a lsync vhdl

@@ -6,6 +6,9 @@ LIBRARY unisim;
 USE unisim.vcomponents.ALL;
 USE ieee.std_logic_1164.ALL;
 
+library axi_time_scan_v1_00_a;
+use axi_time_scan_v1_00_a.lsync;
+
 ENTITY psync IS
    GENERIC (
       -- TRUE for synchronous reset type or FALSE for asynchronous one
@@ -28,19 +31,6 @@ ARCHITECTURE behav_arch OF psync IS
    SIGNAL edge_reg : std_logic := '0';                         -- Edge detector register
    SIGNAL dout_reg : std_logic := '0';                         -- Output pulse register
 
-   -- 2-bits level synchronizer
-   COMPONENT lsync IS
-   GENERIC (
-      SYNC_RST : BOOLEAN                                       -- TRUE for synchronous reset type
-                                                               -- or FALSE for asynchronous one
-   );
-   PORT (
-      R : IN std_logic;                                        -- Reset input
-      C : IN std_logic;                                        -- Clock input
-      O : OUT std_logic;                                       -- Data output
-      I : IN std_logic                                         -- Data input
-   );
-   END COMPONENT lsync;
 
 BEGIN
    -- Toggle circuit register with synchronous reset implementation
@@ -72,7 +62,8 @@ BEGIN
    END GENERATE async_tgle_gen;
 
    -- 2-bits level synchronizer instantiation
-   lsync_inst : lsync GENERIC MAP (SYNC_RST => O_SYNC_RST)
+   lsync_inst : entity axi_time_scan_v1_00_a.lsync
+   GENERIC MAP (SYNC_RST => O_SYNC_RST)
       PORT MAP (R => RO, C => CO, I => tgle_reg, O => sync_reg);
 
    -- Implementation of edge detector with synchronous reset 
