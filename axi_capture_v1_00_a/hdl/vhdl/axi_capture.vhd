@@ -1,62 +1,3 @@
-------------------------------------------------------------------------------
--- axi_capture.vhd - entity/architecture pair
-------------------------------------------------------------------------------
--- IMPORTANT:
--- DO NOT MODIFY THIS FILE EXCEPT IN THE DESIGNATED SECTIONS.
---
--- SEARCH FOR --USER TO DETERMINE WHERE CHANGES ARE ALLOWED.
---
--- TYPICALLY, THE ONLY ACCEPTABLE CHANGES INVOLVE ADDING NEW
--- PORTS AND GENERICS THAT GET PASSED THROUGH TO THE INSTANTIATION
--- OF THE USER_LOGIC ENTITY.
-------------------------------------------------------------------------------
---
--- ***************************************************************************
--- ** Copyright (c) 1995-2012 Xilinx, Inc.  All rights reserved.            **
--- **                                                                       **
--- ** Xilinx, Inc.                                                          **
--- ** XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION "AS IS"         **
--- ** AS A COURTESY TO YOU, SOLELY FOR USE IN DEVELOPING PROGRAMS AND       **
--- ** SOLUTIONS FOR XILINX DEVICES.  BY PROVIDING THIS DESIGN, CODE,        **
--- ** OR INFORMATION AS ONE POSSIBLE IMPLEMENTATION OF THIS FEATURE,        **
--- ** APPLICATION OR STANDARD, XILINX IS MAKING NO REPRESENTATION           **
--- ** THAT THIS IMPLEMENTATION IS FREE FROM ANY CLAIMS OF INFRINGEMENT,     **
--- ** AND YOU ARE RESPONSIBLE FOR OBTAINING ANY RIGHTS YOU MAY REQUIRE      **
--- ** FOR YOUR IMPLEMENTATION.  XILINX EXPRESSLY DISCLAIMS ANY              **
--- ** WARRANTY WHATSOEVER WITH RESPECT TO THE ADEQUACY OF THE               **
--- ** IMPLEMENTATION, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OR        **
--- ** REPRESENTATIONS THAT THIS IMPLEMENTATION IS FREE FROM CLAIMS OF       **
--- ** INFRINGEMENT, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS       **
--- ** FOR A PARTICULAR PURPOSE.                                             **
--- **                                                                       **
--- ***************************************************************************
---
-------------------------------------------------------------------------------
--- Filename:          axi_capture.vhd
--- Version:           1.00.a
--- Description:       Top level design, instantiates library components and user logic.
--- Date:              Thu Jul 19 15:54:53 2018 (by Create and Import Peripheral Wizard)
--- VHDL Standard:     VHDL'93
-------------------------------------------------------------------------------
--- Naming Conventions:
---   active low signals:                    "*_n"
---   clock signals:                         "clk", "clk_div#", "clk_#x"
---   reset signals:                         "rst", "rst_n"
---   generics:                              "C_*"
---   user defined types:                    "*_TYPE"
---   state machine next state:              "*_ns"
---   state machine current state:           "*_cs"
---   combinatorial signals:                 "*_com"
---   pipelined or register delay signals:   "*_d#"
---   counter signals:                       "*cnt*"
---   clock enable signals:                  "*_ce"
---   internal version of output port:       "*_i"
---   device pins:                           "*_pin"
---   ports:                                 "- Names begin with Uppercase"
---   processes:                             "*_PROCESS"
---   component instantiations:              "<ENTITY_>I_<#|FUNC>"
-------------------------------------------------------------------------------
-
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_arith.all;
@@ -66,74 +7,28 @@ library proc_common_v3_00_a;
 use proc_common_v3_00_a.proc_common_pkg.all;
 use proc_common_v3_00_a.ipif_pkg.all;
 
+library axi_lite_ipif_v1_01_a;
+use axi_lite_ipif_v1_01_a.axi_lite_ipif;
+
 library axi_slave_burst_v1_00_a;
 use axi_slave_burst_v1_00_a.axi_slave_burst;
-
-library axi_capture_v1_00_a;
-use axi_capture_v1_00_a.user_logic;
-
-------------------------------------------------------------------------------
--- Entity section
-------------------------------------------------------------------------------
--- Definition of Generics:
---   C_CAPT_AXI_DATA_WIDTH           -- AXI4 slave: Data Width
---   C_CAPT_AXI_ADDR_WIDTH           -- AXI4 slave: Address Width
---   C_CAPT_AXI_ID_WIDTH             -- AXI4 slave: ID Width
---   C_RDATA_FIFO_DEPTH           -- AXI4 slave: FIFO Depth
---   C_INCLUDE_TIMEOUT_CNT        -- AXI4 slave: Data Timeout Count
---   C_TIMEOUT_CNTR_VAL           -- AXI4 slave: Timeout Counter Value
---   C_ALIGN_BE_RDADDR            -- AXI4 slave: Align Byte Enable read Data Address
---   C_CAPT_AXI_SUPPORTS_WRITE       -- AXI4 slave: Support Write
---   C_CAPT_AXI_SUPPORTS_READ        -- AXI4 slave: Support Read
---   C_FAMILY                     -- FPGA Family
---   C_CAPT_AXI_MEM0_BASEADDR        -- User memory space 0 base address
---   C_CAPT_AXI_MEM0_HIGHADDR        -- User memory space 0 high address
---
--- Definition of Ports:
---   CAPT_AXI_ACLK                   -- AXI4 slave: Clock
---   CAPT_AXI_ARESETN                -- AXI4 slave: Reset
---   CAPT_AXI_AWADDR                 -- AXI4 slave: Write address
---   CAPT_AXI_AWVALID                -- AXI4 slave: Write address valid
---   CAPT_AXI_WDATA                  -- AXI4 slave: Write data
---   CAPT_AXI_WSTRB                  -- AXI4 slave: Write strobe
---   CAPT_AXI_WVALID                 -- AXI4 slave: Write data valid
---   CAPT_AXI_BREADY                 -- AXI4 slave: read response ready
---   CAPT_AXI_ARADDR                 -- AXI4 slave: read address
---   CAPT_AXI_ARVALID                -- AXI4 slave: read address valid
---   CAPT_AXI_RREADY                 -- AXI4 slave: read data ready
---   CAPT_AXI_ARREADY                -- AXI4 slave: read address ready
---   CAPT_AXI_RDATA                  -- AXI4 slave: read data
---   CAPT_AXI_RRESP                  -- AXI4 slave: read data response
---   CAPT_AXI_RVALID                 -- AXI4 slave: read data valid
---   CAPT_AXI_WREADY                 -- AXI4 slave: write data ready
---   CAPT_AXI_BRESP                  -- AXI4 slave: read response
---   CAPT_AXI_BVALID                 -- AXI4 slave: read response valid
---   CAPT_AXI_AWREADY                -- AXI4 slave: write address ready
---   CAPT_AXI_AWID                   -- AXI4 slave: write address ID
---   CAPT_AXI_AWLEN                  -- AXI4 slave: write address Length
---   CAPT_AXI_AWSIZE                 -- AXI4 slave: write address size
---   CAPT_AXI_AWBURST                -- AXI4 slave: write address burst
---   CAPT_AXI_AWLOCK                 -- AXI4 slave: write address lock
---   CAPT_AXI_AWCACHE                -- AXI4 slave: write address cache
---   CAPT_AXI_AWPROT                 -- AXI4 slave: write address protection
---   CAPT_AXI_WLAST                  -- AXI4 slave: write data last
---   CAPT_AXI_BID                    -- AXI4 slave: read response ID
---   CAPT_AXI_ARID                   -- AXI4 slave: read address ID
---   CAPT_AXI_ARLEN                  -- AXI4 slave: read address Length
---   CAPT_AXI_ARSIZE                 -- AXI4 slave: read address size
---   CAPT_AXI_ARBURST                -- AXI4 slave: read address burst
---   CAPT_AXI_ARLOCK                 -- AXI4 slave: read address lock
---   CAPT_AXI_ARCACHE                -- AXI4 slave: read address cache
---   CAPT_AXI_ARPROT                 -- AXI4 slave: read address protection
---   CAPT_AXI_RID                    -- AXI4 slave: read data ID
---   CAPT_AXI_RLAST                  -- AXI4 slave: read data last
-------------------------------------------------------------------------------
 
 entity axi_capture is
   generic
   (
     -- ADD USER GENERICS BELOW THIS LINE ---------------
-    --USER generics added here
+    C_S_AXI_DATA_WIDTH             : integer              := 32;
+    C_S_AXI_ADDR_WIDTH             : integer              := 32;
+    C_S_AXI_MIN_SIZE               : std_logic_vector     := X"000001FF";
+    C_USE_WSTRB                    : integer              := 0;
+    C_DPHASE_TIMEOUT               : integer              := 8;
+    C_BASEADDR                     : std_logic_vector     := X"FFFFFFFF";
+    C_HIGHADDR                     : std_logic_vector     := X"00000000";
+    C_FAMILY                       : string               := "virtex6";
+    C_NUM_REG                      : integer              := 1;
+    C_NUM_MEM                      : integer              := 1;
+    C_SLV_AWIDTH                   : integer              := 32;
+    C_SLV_DWIDTH                   : integer              := 32
     -- ADD USER GENERICS ABOVE THIS LINE ---------------
 
     -- DO NOT EDIT BELOW THIS LINE ---------------------
@@ -156,7 +51,25 @@ entity axi_capture is
   port
   (
     -- ADD USER PORTS BELOW THIS LINE ------------------
-    --USER ports added here
+    S_AXI_ACLK                     : in  std_logic;
+    S_AXI_ARESETN                  : in  std_logic;
+    S_AXI_AWADDR                   : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
+    S_AXI_AWVALID                  : in  std_logic;
+    S_AXI_WDATA                    : in  std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+    S_AXI_WSTRB                    : in  std_logic_vector((C_S_AXI_DATA_WIDTH/8)-1 downto 0);
+    S_AXI_WVALID                   : in  std_logic;
+    S_AXI_BREADY                   : in  std_logic;
+    S_AXI_ARADDR                   : in  std_logic_vector(C_S_AXI_ADDR_WIDTH-1 downto 0);
+    S_AXI_ARVALID                  : in  std_logic;
+    S_AXI_RREADY                   : in  std_logic;
+    S_AXI_ARREADY                  : out std_logic;
+    S_AXI_RDATA                    : out std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+    S_AXI_RRESP                    : out std_logic_vector(1 downto 0);
+    S_AXI_RVALID                   : out std_logic;
+    S_AXI_WREADY                   : out std_logic;
+    S_AXI_BRESP                    : out std_logic_vector(1 downto 0);
+    S_AXI_BVALID                   : out std_logic;
+    S_AXI_AWREADY                  : out std_logic
     -- ADD USER PORTS ABOVE THIS LINE ------------------
 
     -- DO NOT EDIT BELOW THIS LINE ---------------------
@@ -165,6 +78,8 @@ entity axi_capture is
     CAPT_AXI_ARESETN                  : in  std_logic;
     CAPT_AXI_AWADDR                   : in  std_logic_vector(C_CAPT_AXI_ADDR_WIDTH-1 downto 0);
     CAPT_AXI_AWVALID                  : in  std_logic;
+    CAPT_AXI_AWREADY                  : in std_logic;
+    
     CAPT_AXI_WDATA                    : in  std_logic_vector(C_CAPT_AXI_DATA_WIDTH-1 downto 0);
     CAPT_AXI_WSTRB                    : in  std_logic_vector((C_CAPT_AXI_DATA_WIDTH/8)-1 downto 0);
     CAPT_AXI_WVALID                   : in  std_logic;
@@ -172,14 +87,14 @@ entity axi_capture is
     CAPT_AXI_ARADDR                   : in  std_logic_vector(C_CAPT_AXI_ADDR_WIDTH-1 downto 0);
     CAPT_AXI_ARVALID                  : in  std_logic;
     CAPT_AXI_RREADY                   : in  std_logic;
-    CAPT_AXI_ARREADY                  : out std_logic;
-    CAPT_AXI_RDATA                    : out std_logic_vector(C_CAPT_AXI_DATA_WIDTH-1 downto 0);
-    CAPT_AXI_RRESP                    : out std_logic_vector(1 downto 0);
-    CAPT_AXI_RVALID                   : out std_logic;
-    CAPT_AXI_WREADY                   : out std_logic;
-    CAPT_AXI_BRESP                    : out std_logic_vector(1 downto 0);
-    CAPT_AXI_BVALID                   : out std_logic;
-    CAPT_AXI_AWREADY                  : out std_logic;
+    CAPT_AXI_ARREADY                  : in std_logic;
+    CAPT_AXI_RDATA                    : in std_logic_vector(C_CAPT_AXI_DATA_WIDTH-1 downto 0);
+    CAPT_AXI_RRESP                    : in std_logic_vector(1 downto 0);
+    CAPT_AXI_RVALID                   : in std_logic;
+    CAPT_AXI_WREADY                   : in std_logic;
+    CAPT_AXI_BRESP                    : in std_logic_vector(1 downto 0);
+    CAPT_AXI_BVALID                   : in std_logic;
+
     CAPT_AXI_AWID                     : in  std_logic_vector(C_CAPT_AXI_ID_WIDTH-1 downto 0);
     CAPT_AXI_AWLEN                    : in  std_logic_vector(7 downto 0);
     CAPT_AXI_AWSIZE                   : in  std_logic_vector(2 downto 0);
@@ -188,7 +103,7 @@ entity axi_capture is
     CAPT_AXI_AWCACHE                  : in  std_logic_vector(3 downto 0);
     CAPT_AXI_AWPROT                   : in  std_logic_vector(2 downto 0);
     CAPT_AXI_WLAST                    : in  std_logic;
-    CAPT_AXI_BID                      : out std_logic_vector(C_CAPT_AXI_ID_WIDTH-1 downto 0);
+    CAPT_AXI_BID                      : in std_logic_vector(C_CAPT_AXI_ID_WIDTH-1 downto 0);
     CAPT_AXI_ARID                     : in  std_logic_vector(C_CAPT_AXI_ID_WIDTH-1 downto 0);
     CAPT_AXI_ARLEN                    : in  std_logic_vector(7 downto 0);
     CAPT_AXI_ARSIZE                   : in  std_logic_vector(2 downto 0);
@@ -196,21 +111,12 @@ entity axi_capture is
     CAPT_AXI_ARLOCK                   : in  std_logic;
     CAPT_AXI_ARCACHE                  : in  std_logic_vector(3 downto 0);
     CAPT_AXI_ARPROT                   : in  std_logic_vector(2 downto 0);
-    CAPT_AXI_RID                      : out std_logic_vector(C_CAPT_AXI_ID_WIDTH-1 downto 0);
-    CAPT_AXI_RLAST                    : out std_logic;
+    CAPT_AXI_RID                      : in std_logic_vector(C_CAPT_AXI_ID_WIDTH-1 downto 0);
+    CAPT_AXI_RLAST                    : in std_logic;
     
-    AXIS_DMA_TDATA                    : out std_logic_vector(C_AXIS_DMA_TDATA_WIDTH-1 downto 0);
-    AXIS_DMA_TKEEP                    : out std_logic_vector((C_AXIS_DMA_TDATA_WIDTH/8)-1 downto 0);
-    AXIS_DMA_TLAST                    : out std_logic;
-    AXIS_DMA_TUSER                    : out std_logic_vector(3 downto 0);
-    AXIS_DMA_TVALID                   : out std_logic;
-    AXIS_DMA_TREADY                   : in  std_logic;
-    AXIS_DMA_TID                      : out std_logic_vector(4 downto 0);
-    AXIS_DMA_TDEST                    : out std_logic_vector(4 downto 0);
-    
-    TIME_AXIS_TLAST                   : out std_logic;
-    TIME_AXIS_TDATA                   : out std_logic_vector(63 downto 0);
-    TIME_AXIS_TVALID                  : out std_logic
+    TIME_AXIS_TLAST                   : in std_logic;
+    TIME_AXIS_TDATA                   : in std_logic_vector(63 downto 0);
+    TIME_AXIS_TVALID                  : in std_logic
     -- DO NOT EDIT ABOVE THIS LINE ---------------------
   );
 
@@ -227,9 +133,75 @@ end entity axi_capture;
 ------------------------------------------------------------------------------
 
 architecture IMP of axi_capture is
+    type capt_state_machine is (capture_axi, send_wr_tr_dma, send_wr_rd_dma);
+    signal state, next_state    : capt_state_machine;
+
+    signal capture_wr_tr                        : std_logic;
+    signal capture_rd_tr                        : std_logic;
+    
+    signal DMA_data_wr_capt                  : std_logic_vector(C_AXIS_DMA_TDATA_WIDTH-1 downto 0);
+    signal DMA_data_rd_capt                  : std_logic_vector(C_AXIS_DMA_TDATA_WIDTH-1 downto 0);
+    
+    signal axis_dma_tdata_o                    : std_logic_vector(C_AXIS_DMA_TDATA_WIDTH-1 downto 0);
+    signal axis_dma_tkeep_o                    : std_logic_vector((C_AXIS_DMA_TDATA_WIDTH/8)-1 downto 0);
+    signal axis_dma_tlast_o                    : std_logic;
+    signal axis_dma_tuser_o                    : std_logic_vector(3 downto 0);
+    signal axis_dma_tvalid_o                   : std_logic;
+    signal axis_dma_tid_o                      : std_logic_vector(4 downto 0);
+    signal axis_dma_tdest_o                    : std_logic_vector(4 downto 0);
 
 
 begin
+  ------------------------------------------
+  -- instantiate axi_lite_ipif
+  ------------------------------------------
+  AXI_LITE_IPIF_I : entity axi_lite_ipif_v1_01_a.axi_lite_ipif
+    generic map
+    (
+      C_S_AXI_DATA_WIDTH             => IPIF_SLV_DWIDTH,
+      C_S_AXI_ADDR_WIDTH             => C_S_AXI_ADDR_WIDTH,
+      C_S_AXI_MIN_SIZE               => C_S_AXI_MIN_SIZE,
+      C_USE_WSTRB                    => C_USE_WSTRB,
+      C_DPHASE_TIMEOUT               => C_DPHASE_TIMEOUT,
+      C_ARD_ADDR_RANGE_ARRAY         => IPIF_ARD_ADDR_RANGE_ARRAY,
+      C_ARD_NUM_CE_ARRAY             => IPIF_ARD_NUM_CE_ARRAY,
+      C_FAMILY                       => C_FAMILY
+    )
+    port map
+    (
+      S_AXI_ACLK                     => S_AXI_ACLK,
+      S_AXI_ARESETN                  => S_AXI_ARESETN,
+      S_AXI_AWADDR                   => S_AXI_AWADDR,
+      S_AXI_AWVALID                  => S_AXI_AWVALID,
+      S_AXI_WDATA                    => S_AXI_WDATA,
+      S_AXI_WSTRB                    => S_AXI_WSTRB,
+      S_AXI_WVALID                   => S_AXI_WVALID,
+      S_AXI_BREADY                   => S_AXI_BREADY,
+      S_AXI_ARADDR                   => S_AXI_ARADDR,
+      S_AXI_ARVALID                  => S_AXI_ARVALID,
+      S_AXI_RREADY                   => S_AXI_RREADY,
+      S_AXI_ARREADY                  => S_AXI_ARREADY,
+      S_AXI_RDATA                    => S_AXI_RDATA,
+      S_AXI_RRESP                    => S_AXI_RRESP,
+      S_AXI_RVALID                   => S_AXI_RVALID,
+      S_AXI_WREADY                   => S_AXI_WREADY,
+      S_AXI_BRESP                    => S_AXI_BRESP,
+      S_AXI_BVALID                   => S_AXI_BVALID,
+      S_AXI_AWREADY                  => S_AXI_AWREADY,
+      Bus2IP_Clk                     => ipif_Bus2IP_Clk,
+      Bus2IP_Resetn                  => ipif_Bus2IP_Resetn,
+      Bus2IP_Addr                    => ipif_Bus2IP_Addr,
+      Bus2IP_RNW                     => ipif_Bus2IP_RNW,
+      Bus2IP_BE                      => ipif_Bus2IP_BE,
+      Bus2IP_CS                      => ipif_Bus2IP_CS,
+      Bus2IP_RdCE                    => ipif_Bus2IP_RdCE,
+      Bus2IP_WrCE                    => ipif_Bus2IP_WrCE,
+      Bus2IP_Data                    => ipif_Bus2IP_Data,
+      IP2Bus_WrAck                   => ipif_IP2Bus_WrAck,
+      IP2Bus_RdAck                   => ipif_IP2Bus_RdAck,
+      IP2Bus_Error                   => ipif_IP2Bus_Error,
+      IP2Bus_Data                    => ipif_IP2Bus_Data
+    );
 
 
 end IMP;
