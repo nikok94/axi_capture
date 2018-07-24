@@ -8,17 +8,17 @@ TABLE OF CONTENTS
 Peripheral Summary:
 
   XPS project / EDK repository               : C:\LEMZ-T\COAL_RBS\axi_capture\edk_library\MyProcessorIPLib
-  logical library name                       : axi_capture_v1_00_a
-  top name                                   : axi_capture
+  logical library name                       : axi_time_scan_v1_00_a
+  top name                                   : axi_time_scan
   version                                    : 1.00.a
-  type                                       : AXI4 slave
+  type                                       : AXI4LITE slave
   features                                   : slave attachment
-                                               user address ranges
+                                               user s/w registers
 
 Address Block for User Logic and IPIF Predefined Services
 
-  User logic memory space 0                  : C_S_AXI_MEM0_BASEADDR
-                                             : C_S_AXI_MEM0_HIGHADDR
+  user logic slave space                     : C_BASEADDR + 0x00000000
+                                             : C_BASEADDR + 0x000000FF
 
 
 ================================================================================
@@ -26,7 +26,7 @@ Address Block for User Logic and IPIF Predefined Services
 ================================================================================
 - HDL source file(s)
 
-  hdl/vhdl/axi_capture.vhd
+  hdl/vhdl/axi_time_scan.vhd
 
     This is the template file for your peripheral's top design entity. It
     configures and instantiates the corresponding design units in the way you
@@ -43,13 +43,13 @@ Address Block for User Logic and IPIF Predefined Services
 
 - XPS interface file(s)
 
-  data/axi_capture_v2_1_0.mpd
+  data/axi_time_scan_v2_1_0.mpd
 
     This Microprocessor Peripheral Description file contains information of the
     interface of your peripheral, so that other EDK tools can recognize your
     peripheral.
 
-  data/axi_capture_v2_1_0.pao
+  data/axi_time_scan_v2_1_0.pao
 
     This Peripheral Analysis Order file defines the analysis order of all the HDL
     source files that are used to compile your peripheral.
@@ -80,6 +80,6 @@ Address Block for User Logic and IPIF Predefined Services
 proc_common_v3_00_a
 	No documentation for this library
 
-axi_slave_burst_v1_00_a
-	C:\LEMZ-T\COAL_RBS\axi_capture\edk\C:\Xilinx\14.7\ISE_DS\EDK\hw\XilinxProcessorIPLib\pcores\axi_slave_burst_v1_00_a\doc\ds769_axi_slave_burst.pdf
+axi_lite_ipif_v1_01_a
+	C:\LEMZ-T\COAL_RBS\axi_capture\prj\AXI_CAPTURE_CREATE.srcs\sources_1\edk\edk\C:\Xilinx\14.7\ISE_DS\EDK\hw\XilinxProcessorIPLib\pcores\axi_lite_ipif_v1_01_a\doc\axi_lite_ipif_ds765.pdf
 

@@ -1,9 +1,8 @@
 -batch 
--create axi_capture 
+-create axi_time_scan 
 -ver 1.00.a 
 -dir "C:\LEMZ-T\COAL_RBS\axi_capture\edk_library\MyProcessorIPLib" 
 -lang vhdl 
--bus axi4 s 
--burst s 32 
--arn 1 
+-bus axi4lite s 
+-reg 3 
 -xps 
